@@ -14,13 +14,14 @@ class ShoppingListController extends Controller
     public function index(Request $request)
     {
         try {
-            $shoppingLists = ShoppingList::with('groceries')->get();
+            $shoppingLists = ShoppingList::where('user_id', $request->user->id)->with('groceries')->get();
+
             return response()->json($shoppingLists);
         } catch (\Throwable $th) {
 
             // error_log($th->getMessage());
             return response()->json([
-                'message' => $th->getMessage()
+                'message' => $th->getMessage(),
             ], 500);
         }
     }
@@ -43,7 +44,7 @@ class ShoppingListController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => $th->getMessage()
+                'message' => $th->getMessage(),
             ], 500);
         }
     }
@@ -69,6 +70,7 @@ class ShoppingListController extends Controller
             $shoppingList = ShoppingList::find($request->shopping_list_id);
             $groceries = Grocerie::where('shopping_list_id', $request->shopping_list_id)->get();
             $shoppingList->groceries = $groceries;
+
             // $shoppingList = ShoppingList::find($request->shopping_list_id)->with('groceries')->get();
             return response()->json(
                 $shoppingList,
@@ -76,7 +78,7 @@ class ShoppingListController extends Controller
             );
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => $th->getMessage()
+                'message' => $th->getMessage(),
             ], 500);
         }
     }
@@ -97,11 +99,12 @@ class ShoppingListController extends Controller
                 );
             } else {
                 $shoppingList->delete();
+
                 return response()->json($shoppingList, 200);
             }
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => $th->getMessage()
+                'message' => $th->getMessage(),
             ], 500);
         }
     }
@@ -125,8 +128,9 @@ class ShoppingListController extends Controller
                     404
                 );
             } else {
-                $grocerie->amount = $request->amount;
+                $grocerie->amount_to_be_purchased = $request->amount;
                 $grocerie->save();
+
                 return response()->json(
                     $grocerie,
                     200
@@ -134,27 +138,21 @@ class ShoppingListController extends Controller
             }
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => $th->getMessage()
+                'message' => $th->getMessage(),
             ], 500);
         }
     }
-
 
     /**
      * Remove the specified shopping list from storage.
      */
     public function deleteGrocerie(Request $request, int $id)
     {
-        try {
 
-            $grocerie = Grocerie::findOrFail($id);
+        $grocerie = Grocerie::findOrFail($id);
 
-            $grocerie->delete();
-            return response()->json($grocerie, 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'message' => $th->getMessage()
-            ], 500);
-        }
+        $grocerie->delete();
+
+        return response()->json($grocerie, 200);
     }
 }
