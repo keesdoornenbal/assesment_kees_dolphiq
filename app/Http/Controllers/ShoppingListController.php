@@ -14,7 +14,7 @@ class ShoppingListController extends Controller
     public function index(Request $request)
     {
         try {
-            $shoppingLists = ShoppingList::get();
+            $shoppingLists = ShoppingList::with('groceries')->get();
             return response()->json($shoppingLists);
         } catch (\Throwable $th) {
 
@@ -51,7 +51,7 @@ class ShoppingListController extends Controller
     /**
      * Store a new shopping list in the database
      */
-    public function addGrocerieToShoppingList(Request $request, int $listId)
+    public function addGrocerieToShoppingList(Request $request)
     {
         try {
             $request->validate([
@@ -60,27 +60,97 @@ class ShoppingListController extends Controller
                 'shopping_list_id' => 'required',
             ]);
 
-            $shoppingList = ShoppingList::find($listId);
+            $newGrocerie = Grocerie::create([
+                'name' => $request->name,
+                'amount' => $request->amount,
+                'shopping_list_id' => $request->shopping_list_id,
+            ]);
 
-            if ($shoppingList != null) {
-                $newGrocerie = Grocerie::create([
-                    'name' => $request->name,
-                    'amount' => $request->amount,
-                    'shopping_list_id' => $shoppingList->id,
-                ]);
+            $shoppingList = ShoppingList::find($request->shopping_list_id);
+            $groceries = Grocerie::where('shopping_list_id', $request->shopping_list_id)->get();
+            $shoppingList->groceries = $groceries;
+            // $shoppingList = ShoppingList::find($request->shopping_list_id)->with('groceries')->get();
+            return response()->json(
+                $shoppingList,
+                201
+            );
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
 
-                $allListsGroceries = $shoppingList->groceries()->get();
-                $shoppingList->groceries = $allListsGroceries;
-                return response()->json([
-                   $shoppingList
-                ], 201);
+    /**
+     * Remove the specified shopping list from storage.
+     */
+    public function destroy(Request $request, int $id)
+    {
+        try {
 
+            $shoppingList = ShoppingList::find($id);
+            if ($shoppingList == null) {
+
+                return response()->json(
+                    $shoppingList,
+                    404
+                );
             } else {
-                return response()->json([
-                    'message' => 'Shoppinglist not found'
-                ], 404);
+                $shoppingList->delete();
+                return response()->json($shoppingList, 200);
             }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
 
+    /**
+     * Remove the specified shopping list from storage.
+     */
+    public function change_grocery_amount(Request $request, int $id)
+    {
+        try {
+
+            $request->validate([
+                'amount' => 'required|min:1',
+            ]);
+
+            $grocerie = Grocerie::find($id);
+            if ($grocerie == null) {
+
+                return response()->json(
+                    $grocerie,
+                    404
+                );
+            } else {
+                $grocerie->amount = $request->amount;
+                $grocerie->save();
+                return response()->json(
+                    $grocerie,
+                    200
+                );
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+
+    /**
+     * Remove the specified shopping list from storage.
+     */
+    public function deleteGrocerie(Request $request, int $id)
+    {
+        try {
+
+            $grocerie = Grocerie::findOrFail($id);
+
+            $grocerie->delete();
+            return response()->json($grocerie, 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => $th->getMessage()

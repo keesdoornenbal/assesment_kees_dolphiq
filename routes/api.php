@@ -9,4 +9,6 @@ use Illuminate\Support\Facades\Route;
 // })->middleware('auth:sanctum');
 
 Route::resource('shopping-lists', ShoppingListController::class);
-Route::post('/shopping-lists/add-grocerie/{listId}', [ShoppingListController::class, 'addGrocerieToShoppingList']);
+Route::post('/shopping-lists/add-grocerie', [ShoppingListController::class, 'addGrocerieToShoppingList']);
+Route::put('/shopping-lists/change-grocerie/{id}', [ShoppingListController::class, 'changeGroceryAmount']);
+Route::put('/shopping-lists/delete-grocerie/{id}', [ShoppingListController::class, 'deleteGrocerie']);
