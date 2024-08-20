@@ -16,6 +16,8 @@ class ShoppingListController extends Controller
             $shoppingLists = ShoppingList::get();
             return response()->json($shoppingLists);
         } catch (\Throwable $th) {
+
+            // error_log($th->getMessage());
             return response()->json([
                 'message' => $th->getMessage()
             ], 500);
@@ -37,7 +39,6 @@ class ShoppingListController extends Controller
             ]);
 
             return response()->json($newShoppingList, 201);
-
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,

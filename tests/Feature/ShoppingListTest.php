@@ -4,23 +4,35 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class ShoppingListTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
-    public function test_example(): void
+
+    public function test_creating_a_shopping_list(): void
     {
-        $response = $this->getJson('/shopping-lists');
+        $response = $this->postJson('/api/shopping-lists', ['name' => 'Sally']);
 
-        // $response->assertJson(
-        //     fn(AssertableJson $json) =>
-        //     $json->has('status')
-        //         ->hasAny('data', 'message', 'code')
-        // );
+        $response
+            ->assertStatus(201)
+            ->assertJson([
+                'created' => true,
+            ]);
+    }
 
-        $response->assertStatus(200);
+    public function test_getting_all_shopping_lists(): void
+    {
+        $response = $this->getJson('/api/shopping-lists');
+
+        $response
+            ->assertStatus(200);
+
+        // $response
+        //     ->assertJson(
+        //         fn(AssertableJson $json) =>
+        //         $json->has(1)
+
+        //     );
     }
 }
