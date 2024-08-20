@@ -8,6 +8,5 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-
-// Route::res('/shopping-list', [ShoppingListController::class]);
 Route::resource('shopping-lists', ShoppingListController::class);
+Route::post('/shopping-lists/add-grocerie/{listId}', [ShoppingListController::class, 'addGrocerieToShoppingList']);

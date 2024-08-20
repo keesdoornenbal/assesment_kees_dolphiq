@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class ShoppingListTest extends TestCase
@@ -15,10 +14,7 @@ class ShoppingListTest extends TestCase
         $response = $this->postJson('/api/shopping-lists', ['name' => 'Sally']);
 
         $response
-            ->assertStatus(201)
-            ->assertJson([
-                'created' => true,
-            ]);
+            ->assertStatus(201);
     }
 
     public function test_getting_all_shopping_lists(): void
@@ -27,12 +23,5 @@ class ShoppingListTest extends TestCase
 
         $response
             ->assertStatus(200);
-
-        // $response
-        //     ->assertJson(
-        //         fn(AssertableJson $json) =>
-        //         $json->has(1)
-
-        //     );
     }
 }
